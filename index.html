@@ -12,9 +12,12 @@
         .hub-body-right{overflow:hidden;padding-right:5px;}
         .hub-pagec{margin-top:20px;}
         .hub-page-iframe{width:100%;height:100%;min-height:700px;}
-        .hubtabs{overflow:hidden;list-style:none;}
+        .hubtabc{overflow:hidden;list-style:none;}
         .hubtab-item{float:left;padding: 10px 20px;background-color: #cecece;margin-left: 5px;position:relative;}
+        .hubtab-item.active{background-color:#fff;}
         .hubtab-item-close{position:absolute;top:3px;right:3px;}
+        .page-item{display:none;}
+        .page-item.active{display:block;}
     </style>
 </head>
 <body>
@@ -23,58 +26,80 @@
        <div class="hub-body">
             <div class="hub-body-left">
                 <ul id="hubmenuc" class="menus">
-                    <li class="menu-item" title="百度" src="https://dwz.cn/9DRUCHGm">百度</li>
-                    <li class="menu-item" title="bing" src="https://cn.bing.com/?toHttps=1&redig=0DFBA612347544F881CDCCEC5D9AB1B2">bing</li>
-                    <li class="menu-item" title="三六零" src="https://www.so.com">三六零</li>
-                    <li class="menu-item" title="搜狗" src="https://www.sogou.com/">搜狗</li>
-                    <li class="menu-item" title="tinper" src="http://tinper.org/mdf/扩展开发-级联参照开发">tinper</li>
+                    <li class="menu-item" index="0" title="百度" src="https://dwz.cn/9DRUCHGm">百度</li>
+                    <li class="menu-item" index="1" title="bing" src="https://cn.bing.com/?toHttps=1&redig=0DFBA612347544F881CDCCEC5D9AB1B2">bing</li>
+                    <li class="menu-item" index="2" title="三六零" src="https://www.so.com">三六零</li>
+                    <li class="menu-item" index="3" title="搜狗" src="https://www.sogou.com/">搜狗</li>
+                    <li class="menu-item" index="4" title="tinper" src="http://tinper.org/mdf/扩展开发-级联参照开发">tinper</li>
                 </ul>
             </div>
             <div class="hub-body-right">
                 <div class="hub-tabc">
-                    <ul class="hubtabs">
-                      
-                    </ul>
+                    <ul class="hubtabc"></ul>
                 </div>
                 <div class="hub-pagec">
-                    <iframe id="hub-page-iframe" src="" class="hub-page-iframe"></iframe>
+                    <ul class="hubpagec"></ul>
                 </div>
             </div>
        </div>
        <div class="hub-foot"></div>
     </div>
     <script>
-        var menuc,ifr,tabs,n = 0;
+        var menuc,tabc,pagec,n = 0;
         document.addEventListener('DOMContentLoaded',function(){
             menuc = document.getElementById('hubmenuc');
-            ifr = document.getElementById('hub-page-iframe');
-            tabs = document.querySelector('.hubtabs');
+            tabc = document.querySelector('.hubtabc');
+            pagec = document.querySelector('.hubpagec');
 
             menuc.addEventListener('click',function(e){
                 var target = e.target;
-                buildTab(target);
+                addTab(target);
+                activeTab(target);
             });
             
-            tabs.addEventListener('click',function(e){
+            tabc.addEventListener('click',function(e){
                 var target = e.target;
                 if(target.className.includes('hubtab-item-close')){
-                    tabs.removeChild(target.parentNode);
+                    tabc.removeChild(target.parentNode);
                 }
-                else if(target.parentNode.includes('hubtab-item-close')){
-                    tabs.removeChild(target.parentNode.parentNode);
+                else if(target.parentNode.className.includes('hubtab-item-close')){
+                    tabc.removeChild(target.parentNode.parentNode);
+                }
+                else if(target.className.includes('hubtab-item')){
+                    activeTab(target);
+                }
+                else if(target.parentNode.className.includes('hubtab-item')){
+                    activeTab(target.parentNode);
                 }
             });
 
-            buildTab(menuc.firstElementChild);
+            addTab(menuc.firstElementChild);
+            activeTab(tabc.firstElementChild);
         });
 
 
-        function buildTab(target){
+        function addTab(target){
             var src = target.getAttribute('src');
-            ifr.src = src;
-
             var title = target.getAttribute('title');
-            tabs.insertAdjacentHTML('beforeend',`<li class="hubtab-item">${title}<span class="hubtab-item-close">×<span></li>`);
+            var index = n++;
+            tabc.insertAdjacentHTML('beforeend',`<li index=${index} class="hubtab-item">${title}<span class="hubtab-item-close">×<span></li>`);
+            pagec.insertAdjacentHTML('beforeend',`<li index=${index} class="page-item"><iframe id="hub-page-iframe" src=${src} class="hub-page-iframe"></iframe></li>`);
+        }
+
+        function activeTab(target){
+            var index = target.getAttribute('index');
+            Array.from(tabc.children).forEach(item => {
+                item.classList.remove('active');
+            });
+            target.classList.add('active');
+
+            var activePage = pagec.querySelector(`li[index="${index}"]`);
+            Array.from(pagec.children).forEach(item => item.classList.remove('active'));
+            activePage.classList.add('active');
+        }
+
+        function removeTab(target){
+            
         }
     </script>
 </body>
